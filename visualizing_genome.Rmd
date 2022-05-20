@@ -1,0 +1,37 @@
+---
+title: "Visualizing_genome"
+author: "Paulyna Magana"
+date: "19/05/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Libraries
+
+```{r}
+library(Gviz)
+library(GenomicRanges)
+```
+
+
+```{r}
+
+data(cpgIslands)
+class(cpgIslands)
+
+chr <- as.character(unique(seqnames(cpgIslands)))
+gen <- genome(cpgIslands)
+atrack <- AnnotationTrack(cpgIslands, name= "CpG")
+
+```
+
+
+## R Markdown
+
+
+```{r pressure, echo=FALSE}
+sessionInfo()
+```
