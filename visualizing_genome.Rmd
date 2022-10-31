@@ -6,35 +6,30 @@ output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(cache=TRUE, echo = TRUE)
 ```
 
 # Libraries
 
 ```{r, message=FALSE, warning=FALSE}
 library(Gviz)
+library(rtracklayer)
 library(GenomicRanges)
+library(biomaRt)
 ```
 
+```{r tracknames, warning=FALSE}
 
-```{r, warning=FALSE}
-
-data(cpgIslands)
-class(cpgIslands)
-
-chr <- as.character(unique(seqnames(cpgIslands)))
-gen <- genome(cpgIslands) #plot the single CpG islands annotation track.
+session <- browserSession()
+genome(session) <- "hg38"
+trackNames(session)
 
 ```
 
-```{r, warning=FALSE}
-atrack <- AnnotationTrack(cpgIslands, name= "CpG") #plot cpgislands
+```{r example, warning=FALSE, cache=TRUE, fig.width=8, fig.height=4}
 gtrack <- GenomeAxisTrack() #to add a genomic axis to the plot
-ideoTrack <- IdeogramTrack(genome = "hg19", chromosome = "chr6")# ideogram
-```
+ideoTrack <- IdeogramTrack(genome = "hg38", chromosome = "chr6")# ideogram
 
-
-```{r plot, fig.width=8, fig.height=5}
 #plot
 # showbandId - chromosome bands in the ideogram
 # turn off the explicit plotting of the chromosome name by setting the showId display parameter to FALSE.
@@ -42,76 +37,31 @@ plotTracks(ideoTrack, from = 85e6, to = 129e6, showId = FALSE,
            showBandId = TRUE, cex.bands = 0.5)
 ```
 
-
-```{r, cache=TRUE, fig.width=12, fig.height=9}
+```{r SLC22A1, warning=FALSE, cache=TRUE, fig.width=8, fig.height=4}
 
 ###Simple annotation tracks:
 from <- 160115734
 to <- 160160664
-cpgIslands <- UcscTrack(genome="hg38", chromosome="chr6",
-                        track="CpG Islands", from=from, to=to,
-                        trackType="AnnotationTrack", start="chromStart", end="chromEnd",
-                        id="name", shape="box", fill="#006400", name="CpG Islands")
 
 
-snpLocations <- UcscTrack(genome="hg38", chromosome="chr6",
-                          track="All SNPs(144)", from=from, to=to, trackType="AnnotationTrack",
-                          start="chromStart", end="chromEnd", id="name", feature="func",
-                          strand="strand", shape="box", stacking="dense", fill="black",
-                          name="SNPs")
-
-oreganno <- UcscTrack(genome="hg38", chromosome="chr6",
-                        track="ORegAnno", from=from, to=to,
-                        trackType="AnnotationTrack", start="chromStart", end="chromEnd",
-                        id="name", shape="box", fill="#CE796B", col="transparent", name="Regulatory Elements")
 
 ##Gene model type tracks:
 
-#knownGenes <- UcscTrack(genome="hg38", chromosome="chr6",
-                   #     track="knownGene", from=from, to=to, trackType="GeneRegionTrack",
-                    #    rstarts="exonStarts", rends="exonEnds", gene="name", symbol="name",
-                    #    transcript="name", strand="strand", fill="#8282d2", name="UCSC Genes")
+ncbi_ref <- UcscTrack(genome="hg38", chromosome="chr6", track="NCBI RefSeq", 
+                    from=from, to=to, trackType="GeneRegionTrack", 
+                    rstarts="exonStarts", rends="exonEnds", gene="name", 
+                    symbol="name", transcript="name", strand="strand", 
+                    fill="#767676",stacking="squish", name="NCBI RefSeq", 
+                    showId=TRUE, geneSymbol=TRUE)
 
 
 biomTrack <- BiomartGeneRegionTrack(genome="hg38", chromosome="chr6",
                                     start=from, end=to, name="Ensembl")
 
-#ensGenes <- UcscTrack(genome="hg38", chromosome="chr6",
-                     # track="All GENCODE V25", from=from, to=to, trackType="GeneRegionTrack",
-                    #  rstarts="exonStarts", rends="exonEnds", gene="name",
-                     # symbol="name2", transcript="name", strand="strand",
-                    #  fill="#960000", name="Ensembl Genes")
-
 
 ###Data tracks
 
-conservation <- UcscTrack(genome="hg38", chromosome="chr6",
-                          track="Conservation", table="phastCons100way", from=from, to=to,
-                          trackType="DataTrack", start="start", end="end", data="score",
-                          type="hist", window="auto", col.histogram="darkblue",
-                          fill.histogram="darkblue", ylim=c(-3.7, 4), name="Conservation")
 
-clinvar <- UcscTrack(genome="hg38", chromosome="chr6",
-                          track="clinvar", table="clinvarCnv", from=from, to=to, trackType="DataTrack",
-                          start="start", end="end", data="score",
-                          type="p", stacking="dense", bol="lightgrey", 
-                          name="ClinVar")
-
-gcContent <- UcscTrack(genome="hg38", chromosome="chr6",
-                       track="GC Percent", table="gc5Base", from=from, to=to,
-                       trackType="DataTrack", start="start", end="end", data="score",
-                       type="hist", window=-1, windowSize=1500, fill.histogram="black",
-                       col.histogram="black", ylim=c(30, 70), name="GC Percent")
-
-EPD <- UcscTrack(genome="hg38", chromosome="chr6",
-                 track="EPDnew", table="epdNewPromoter", from=from, to=to,
-                 trackType="DataTrack", start="start", end="end", data="score",
-                 type="p", stacking="dense", fill="black", name="EPD new")
-
-DNAse <- UcscTrack(genome="hg38", chromosome="chr6",
-                   track= "DNase HS", table="wgEncodeRegDnaseUwA549Peak", from=from, to=to,
-                   trackType="DataTrack", start="start", end="end", data="score",
-                   type="p", stacking="dense", bol="lightgrey", name="DNase HS")
 
 ###Other tracks and plotting: 
 
@@ -119,40 +69,131 @@ axTrack <- GenomeAxisTrack()
 idxTrack <- IdeogramTrack(genome="hg38", chromosome="chr6")
 
 ##PLOTTING
-plotTracks(list(idxTrack, axTrack, biomTrack, EPD, oreganno, DNAse,
-                cpgIslands, gcContent, snpLocations, clinvar), from=from, to=to, showTitle=TRUE, col.line=NULL,
+plotTracks(list(idxTrack, axTrack, ncbi_ref), from=from, to=to, showTitle=TRUE, col.line=NULL,
            collapseTranscripts="longest", transcriptAnnotation = "symbol")
 
 
 ```
 
-```{r}
-## Add a highlight
-h1= 160120029
-h2 = 160123742
-chromo = 6
+
+```{r SLC22A1 high, warning=FALSE, cache=TRUE, fig.width=8, fig.height=4}
+ht <- HighlightTrack(trackList = list(axTrack, ncbi_ref),
+                     start = c(160136234, 160136250), width = 7,
+                     chromosome = 6)
+
+lim <- c(from, to)
+
+plotTracks(list(idxTrack, ht), from = lim[1], to = lim[2])
+
+
+```
+
+### SLC22A5
+
+```{r SLC22A5, warning=FALSE, cache=TRUE, fig.width=12, fig.height=4}
+
+###Simple annotation tracks:
+from <- 132366800
+to <- 132396017
+
+
+##Gene model type tracks:
+
+ncbi_ref <- UcscTrack(genome="hg38", chromosome="chr5", track="NCBI RefSeq", 
+                    from=from, to=to, trackType="GeneRegionTrack", 
+                    rstarts="exonStarts", rends="exonEnds", gene="name", 
+                    symbol="name", transcript="name", strand="strand", 
+                    fill="#767676",stacking="squish", name="NCBI RefSeq", 
+                    showId=TRUE, geneSymbol=TRUE)
+
+
+biomTrack <- BiomartGeneRegionTrack(genome="hg38", chromosome="chr5",
+                                    start=from, end=to, name="Ensembl")
+
+
+###Data tracks
+
+
+
+###Other tracks and plotting: 
+
+axTrack <- GenomeAxisTrack()
+idxTrack <- IdeogramTrack(genome="hg38", chromosome="chr5")
+
+##PLOTTING
+plotTracks(list(idxTrack, axTrack, ncbi_ref), from=from, to=to, showTitle=TRUE, col.line=NULL,
+           collapseTranscripts="longest", transcriptAnnotation = "symbol")
+
+```
+
+```{r SLC22A5 high, warning=FALSE, cache=TRUE, fig.width=12, fig.height=4}
+ht <- HighlightTrack(trackList = list(axTrack, ncbi_ref),
+                     start = c(132384160, 132384180), width = 7,
+                     chromosome = 5)
+
+lim <- c(from, to)
+
+plotTracks(list(idxTrack, ht), from = lim[1], to = lim[2])
+
 
 ```
 
 
-```{r}
-library(rtracklayer)
-session <- browserSession()
-genome(session) <- "hg38"
-trackNames(session)
+### SLC22A4
+
+```{r SLC22A4, warning=FALSE, cache=TRUE, fig.width=14, fig.height=4}
+
+###Simple annotation tracks:
+from <- 132290928
+to <- 132345343
+
+
+##Gene model type tracks:
+
+ncbi_ref <- UcscTrack(genome="hg38", chromosome="chr5", track="NCBI RefSeq", 
+                    from=from, to=to, trackType="GeneRegionTrack", 
+                    rstarts="exonStarts", rends="exonEnds", gene="name", 
+                    symbol="name", transcript="name", strand="strand", 
+                    fill="#767676",stacking="squish", name="NCBI RefSeq", 
+                    showId=TRUE, geneSymbol=TRUE)
+
+
+biomTrack <- BiomartGeneRegionTrack(genome="hg38", chromosome="chr5",
+                                    start=from, end=to, name="Ensembl")
+
+
+###Data tracks
+
+
+
+###Other tracks and plotting: 
+
+axTrack <- GenomeAxisTrack()
+idxTrack <- IdeogramTrack(genome="hg38", chromosome="chr5")
+
+##PLOTTING
+plotTracks(list(idxTrack, axTrack, ncbi_ref), from=from, to=to, showTitle=TRUE, col.line=NULL,
+           collapseTranscripts="longest", transcriptAnnotation = "symbol")
+
 ```
 
-```{r}
-query <- ucscTableQuery(session, "clinvar",
-                        GRangesForUCSCGenome("hg38", "chr6",
-                                             IRanges(from,to)))
-tableNames(query)
+```{r SLC22A4 high, warning=FALSE, cache=TRUE, fig.width=16, fig.height=4}
+
+ht <- HighlightTrack(trackList = list(axTrack, ncbi_ref),
+                     start = c(132313626, 132313650), width = 7,
+                     chromosome = 5)
+
+lim <- c(from, to)
+
+plotTracks(list(idxTrack, ht), from = lim[1], to = lim[2])
+
+
 ```
+
 
 
 ## R Markdown
 
-
-```{r pressure, echo=FALSE}
+```{r sessioninfo, echo=FALSE}
 sessionInfo()
 ```

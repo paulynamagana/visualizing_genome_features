@@ -1,0 +1,10 @@
+visualizing_genome_cache/
+visualizing_genome_files/
+*.Rhistory
+*.RData
+*.log
+*.tex
+*/latex
+visualizing_genome_cache/latex/__packages
+visualizing_genome_cache/latex/__packages
+*.RData

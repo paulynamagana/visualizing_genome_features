@@ -4,3 +4,5 @@ IRanges
 GenomeInfoDb
 GenomicRanges
 Gviz
+rtracklayer
+biomaRt
