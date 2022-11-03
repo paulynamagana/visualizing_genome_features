@@ -6,10 +6,13 @@ output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(cache=TRUE, echo = TRUE)
+knitr::opts_chunk$set(dev = "png",
+                      dpi = 900,
+                      echo = TRUE,
+                      cache = TRUE)
 ```
 
-# Libraries
+### Libraries
 
 ```{r, message=FALSE, warning=FALSE}
 library(Gviz)
@@ -37,18 +40,20 @@ plotTracks(ideoTrack, from = 85e6, to = 129e6, showId = FALSE,
            showBandId = TRUE, cex.bands = 0.5)
 ```
 
+# SLC22A1
+
 ```{r SLC22A1, warning=FALSE, cache=TRUE, fig.width=8, fig.height=4}
 
 ###Simple annotation tracks:
-from <- 160115734
-to <- 160160664
+fromA1 <- 160115734
+toA1 <- 160160664
 
 
 
 ##Gene model type tracks:
 
 ncbi_ref <- UcscTrack(genome="hg38", chromosome="chr6", track="NCBI RefSeq", 
-                    from=from, to=to, trackType="GeneRegionTrack", 
+                    from=fromA1, to=toA1, trackType="GeneRegionTrack", 
                     rstarts="exonStarts", rends="exonEnds", gene="name", 
                     symbol="name", transcript="name", strand="strand", 
                     fill="#767676",stacking="squish", name="NCBI RefSeq", 
@@ -56,7 +61,7 @@ ncbi_ref <- UcscTrack(genome="hg38", chromosome="chr6", track="NCBI RefSeq",
 
 
 biomTrack <- BiomartGeneRegionTrack(genome="hg38", chromosome="chr6",
-                                    start=from, end=to, name="Ensembl")
+                                    start=fromA1, end=toA1, name="Ensembl")
 
 
 ###Data tracks
@@ -65,42 +70,71 @@ biomTrack <- BiomartGeneRegionTrack(genome="hg38", chromosome="chr6",
 
 ###Other tracks and plotting: 
 
-axTrack <- GenomeAxisTrack()
+axTrack <- GenomeAxisTrack(labelPos="below")
 idxTrack <- IdeogramTrack(genome="hg38", chromosome="chr6")
 
 ##PLOTTING
-plotTracks(list(idxTrack, axTrack, ncbi_ref), from=from, to=to, showTitle=TRUE, col.line=NULL,
+plotTracks(list(idxTrack, axTrack, ncbi_ref), from=fromA1, toA1, showTitle=TRUE, col.line=NULL,
            collapseTranscripts="longest", transcriptAnnotation = "symbol")
 
 
 ```
 
+## highlight CRISPR-Cas9 region
 
 ```{r SLC22A1 high, warning=FALSE, cache=TRUE, fig.width=8, fig.height=4}
 ht <- HighlightTrack(trackList = list(axTrack, ncbi_ref),
                      start = c(160136234, 160136250), width = 7,
                      chromosome = 6)
 
-lim <- c(from, to)
+lim <- c(fromA1, toA1)
 
 plotTracks(list(idxTrack, ht), from = lim[1], to = lim[2])
 
 
 ```
 
-### SLC22A5
+## luciferase regions
+
+```{r}
+library(tidyverse)
+
+luciferase_plasmids <- read_csv("./luciferase_plasmids.csv")
+
+as.data.frame(luciferase_plasmids)
+
+luciferase_plasmids$start <- as.integer(luciferase_plasmids$start)
+luciferase_plasmids$end <- as.integer(luciferase_plasmids$end)
+luciferase_plasmids$width <- as.integer(luciferase_plasmids$width)
+luciferase_plasmids$chromosome <- as.factor(luciferase_plasmids$chromosome)
+luciferase_plasmids$gene <- as.factor(luciferase_plasmids$gene)
+
+
+head(luciferase_plasmids)
+```
+
+```{r SLC22A1 LUCIFERASE, warning=FALSE, cache=TRUE, fig.width=12, fig.height=4}
+grtrack <- GeneRegionTrack(luciferase_plasmids, genome = "hg38",
+                           chromosome = "chr6",
+                           name = "Luciferase regions")
+
+plotTracks(list(idxTrack,axTrack, ncbi_ref, grtrack), from = 160118000, to = 160126000, transcriptAnnotation="gene")
+
+```
+
+# SLC22A5
 
 ```{r SLC22A5, warning=FALSE, cache=TRUE, fig.width=12, fig.height=4}
 
 ###Simple annotation tracks:
-from <- 132366800
-to <- 132396017
+fromA5 <- 132366800
+toA5 <- 132396017
 
 
 ##Gene model type tracks:
 
 ncbi_ref <- UcscTrack(genome="hg38", chromosome="chr5", track="NCBI RefSeq", 
-                    from=from, to=to, trackType="GeneRegionTrack", 
+                    from=fromA5, to=toA5, trackType="GeneRegionTrack", 
                     rstarts="exonStarts", rends="exonEnds", gene="name", 
                     symbol="name", transcript="name", strand="strand", 
                     fill="#767676",stacking="squish", name="NCBI RefSeq", 
@@ -108,7 +142,7 @@ ncbi_ref <- UcscTrack(genome="hg38", chromosome="chr5", track="NCBI RefSeq",
 
 
 biomTrack <- BiomartGeneRegionTrack(genome="hg38", chromosome="chr5",
-                                    start=from, end=to, name="Ensembl")
+                                    start=fromA5, end=toA5, name="Ensembl")
 
 
 ###Data tracks
@@ -117,41 +151,56 @@ biomTrack <- BiomartGeneRegionTrack(genome="hg38", chromosome="chr5",
 
 ###Other tracks and plotting: 
 
-axTrack <- GenomeAxisTrack()
+axTrack <- GenomeAxisTrack(labelPos="below")
 idxTrack <- IdeogramTrack(genome="hg38", chromosome="chr5")
 
 ##PLOTTING
-plotTracks(list(idxTrack, axTrack, ncbi_ref), from=from, to=to, showTitle=TRUE, col.line=NULL,
+plotTracks(list(idxTrack, axTrack, ncbi_ref), from=fromA5, to=toA5, showTitle=TRUE, col.line=NULL,
            collapseTranscripts="longest", transcriptAnnotation = "symbol")
 
 ```
 
+## highlight CRISPR-Cas9 region
+
 ```{r SLC22A5 high, warning=FALSE, cache=TRUE, fig.width=12, fig.height=4}
+
 ht <- HighlightTrack(trackList = list(axTrack, ncbi_ref),
                      start = c(132384160, 132384180), width = 7,
                      chromosome = 5)
 
-lim <- c(from, to)
+lim <- c(fromA5, toA5)
 
 plotTracks(list(idxTrack, ht), from = lim[1], to = lim[2])
 
 
 ```
 
+## luciferase regions
 
-### SLC22A4
+
+```{r SLC22A5 LUCIFERASE, warning=FALSE, cache=TRUE, fig.width=12, fig.height=6}
+grtrack <- GeneRegionTrack(luciferase_plasmids, genome = "hg38",
+                           chromosome = "chr5",
+                           name = "Luciferase regions")
+
+plotTracks(list(idxTrack,axTrack, ncbi_ref, grtrack), from = fromA5, to = 132389321, transcriptAnnotation="gene")
+
+```
+
+
+# SLC22A4
 
 ```{r SLC22A4, warning=FALSE, cache=TRUE, fig.width=14, fig.height=4}
 
 ###Simple annotation tracks:
-from <- 132290928
-to <- 132345343
+fromA4 <- 132290928
+toA4 <- 132345343
 
 
 ##Gene model type tracks:
 
 ncbi_ref <- UcscTrack(genome="hg38", chromosome="chr5", track="NCBI RefSeq", 
-                    from=from, to=to, trackType="GeneRegionTrack", 
+                    from=fromA4, to=toA4, trackType="GeneRegionTrack", 
                     rstarts="exonStarts", rends="exonEnds", gene="name", 
                     symbol="name", transcript="name", strand="strand", 
                     fill="#767676",stacking="squish", name="NCBI RefSeq", 
@@ -159,7 +208,7 @@ ncbi_ref <- UcscTrack(genome="hg38", chromosome="chr5", track="NCBI RefSeq",
 
 
 biomTrack <- BiomartGeneRegionTrack(genome="hg38", chromosome="chr5",
-                                    start=from, end=to, name="Ensembl")
+                                    start=fromA4, end=toA4, name="Ensembl")
 
 
 ###Data tracks
@@ -168,14 +217,16 @@ biomTrack <- BiomartGeneRegionTrack(genome="hg38", chromosome="chr5",
 
 ###Other tracks and plotting: 
 
-axTrack <- GenomeAxisTrack()
+axTrack <- GenomeAxisTrack(labelPos="below")
 idxTrack <- IdeogramTrack(genome="hg38", chromosome="chr5")
 
 ##PLOTTING
-plotTracks(list(idxTrack, axTrack, ncbi_ref), from=from, to=to, showTitle=TRUE, col.line=NULL,
+plotTracks(list(idxTrack, axTrack, ncbi_ref), from=fromA4, to=toA4, showTitle=TRUE, col.line=NULL,
            collapseTranscripts="longest", transcriptAnnotation = "symbol")
 
 ```
+
+## highlight CRISPR-Cas9 region
 
 ```{r SLC22A4 high, warning=FALSE, cache=TRUE, fig.width=16, fig.height=4}
 
@@ -183,16 +234,29 @@ ht <- HighlightTrack(trackList = list(axTrack, ncbi_ref),
                      start = c(132313626, 132313650), width = 7,
                      chromosome = 5)
 
-lim <- c(from, to)
+lim <- c(fromA4, toA4)
 
 plotTracks(list(idxTrack, ht), from = lim[1], to = lim[2])
 
 
 ```
 
+## luciferase regions
 
 
-## R Markdown
+```{r SLC22A4 LUCIFERASE, warning=FALSE, cache=TRUE, fig.width=12, fig.height=4}
+grtrack <- GeneRegionTrack(luciferase_plasmids, genome = "hg38",
+                           chromosome = "chr5",
+                           name = "Luciferase regions")
+
+plotTracks(list(idxTrack,axTrack, ncbi_ref, grtrack), from = 132293519, to = 132295119, transcriptAnnotation="gene")
+
+```
+
+
+
+
+## Session Info
 
 ```{r sessioninfo, echo=FALSE}
 sessionInfo()
