@@ -7,7 +7,7 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(dev = "png",
-                      dpi = 900,
+                      dpi = 1000,
                       echo = TRUE,
                       cache = TRUE)
 ```
@@ -84,13 +84,12 @@ plotTracks(list(idxTrack, axTrack, ncbi_ref), from=fromA1, toA1, showTitle=TRUE,
 
 ```{r SLC22A1 high, warning=FALSE, cache=TRUE, fig.width=8, fig.height=4}
 ht <- HighlightTrack(trackList = list(axTrack, ncbi_ref),
-                     start = c(160136234, 160136250), width = 7,
+                     start = c(160136234, 160133991), width = 10,
                      chromosome = 6)
 
 lim <- c(fromA1, toA1)
 
 plotTracks(list(idxTrack, ht), from = lim[1], to = lim[2])
-
 
 ```
 
@@ -165,7 +164,7 @@ plotTracks(list(idxTrack, axTrack, ncbi_ref), from=fromA5, to=toA5, showTitle=TR
 ```{r SLC22A5 high, warning=FALSE, cache=TRUE, fig.width=12, fig.height=4}
 
 ht <- HighlightTrack(trackList = list(axTrack, ncbi_ref),
-                     start = c(132384160, 132384180), width = 7,
+                     start = c(132384160, 132378383), width = 10,
                      chromosome = 5)
 
 lim <- c(fromA5, toA5)
@@ -231,7 +230,7 @@ plotTracks(list(idxTrack, axTrack, ncbi_ref), from=fromA4, to=toA4, showTitle=TR
 ```{r SLC22A4 high, warning=FALSE, cache=TRUE, fig.width=16, fig.height=4}
 
 ht <- HighlightTrack(trackList = list(axTrack, ncbi_ref),
-                     start = c(132313626, 132313650), width = 7,
+                     start = c(132313626, 132312204), width = 7,
                      chromosome = 5)
 
 lim <- c(fromA4, toA4)
