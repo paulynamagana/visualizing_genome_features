@@ -42,11 +42,11 @@ plotTracks(ideoTrack, from = 85e6, to = 129e6, showId = FALSE,
 
 # SLC22A1
 
-```{r SLC22A1, warning=FALSE, cache=TRUE, fig.width=8, fig.height=4}
+```{r SLC22A1, warning=FALSE, cache=TRUE, fig.width=8, fig.height=10}
 
 ###Simple annotation tracks:
-fromA1 <- 160115734
-toA1 <- 160160664
+fromA1 <- 160118000
+toA1 <- 160126000
 
 
 
@@ -60,38 +60,35 @@ ncbi_ref <- UcscTrack(genome="hg38", chromosome="chr6", track="NCBI RefSeq",
                     showId=TRUE, geneSymbol=TRUE)
 
 
-biomTrack <- BiomartGeneRegionTrack(genome="hg38", chromosome="chr6",
-                                    start=fromA1, end=toA1, name="Ensembl")
+
+###Annotation tracks
+cpgIslands <- UcscTrack(genome = "hg38", chromosome = "chr6", 
+                        track = "cpgIslandExt", from = fromA1, to = toA1,
+                        trackType = "AnnotationTrack", 
+                        id = "name", shape = "box", fill = "#006400", 
+                        name = "CpG Islands")
+
+## Data Tracks
 
 
-###Data tracks
+jaspar <- UcscTrack(genome="hg38", chromosome="chr6",
+                       track="JASPAR Transcription Factors", table="jaspar2022", from=fromA1, to=toA1,
+                       trackType="DataTrack", start="start", end="end", data="score", stacking="dense",name="jaspar")
 
 
 
 ###Other tracks and plotting: 
 
-axTrack <- GenomeAxisTrack(labelPos="below", height=6)
+axTrack <- GenomeAxisTrack(labelPos="below")
 idxTrack <- IdeogramTrack(genome="hg38", chromosome="chr6")
 
 ##PLOTTING
-plotTracks(list(idxTrack, axTrack, ncbi_ref), from=fromA1, toA1, showTitle=TRUE, col.line=NULL,
-           collapseTranscripts="longest", transcriptAnnotation = "symbol")
+plotTracks(list(idxTrack, axTrack, ncbi_ref, cpgIslands, jaspar), from=fromA1, toA1,
+           showTitle=TRUE, col.line=NULL, transcriptAnnotation = "symbol")
 
 
 ```
 
-## highlight CRISPR-Cas9 region
-
-```{r SLC22A1 high, warning=FALSE, cache=TRUE, fig.width=8, fig.height=5}
-ht <- HighlightTrack(trackList = list(axTrack, ncbi_ref),
-                     start = c(160136234, 160133991), width = 10,
-                     chromosome = 6)
-
-lim <- c(fromA1, toA1)
-
-plotTracks(list(idxTrack, ht), from = lim[1], to = lim[2])
-
-```
 
 ## luciferase regions
 
@@ -112,14 +109,6 @@ luciferase_plasmids$gene <- as.factor(luciferase_plasmids$gene)
 head(luciferase_plasmids)
 ```
 
-```{r SLC22A1 LUCIFERASE, warning=FALSE, cache=TRUE, fig.width=12, fig.height=4}
-grtrack <- GeneRegionTrack(luciferase_plasmids, genome = "hg38",
-                           chromosome = "chr6",
-                           name = "Luciferase regions")
-
-plotTracks(list(idxTrack,axTrack, ncbi_ref, grtrack), from = 160118000, to = 160126000, transcriptAnnotation="gene")
-
-```
 
 # SLC22A5
 
@@ -159,20 +148,6 @@ plotTracks(list(idxTrack, axTrack, ncbi_ref), from=fromA5, to=toA5, showTitle=TR
 
 ```
 
-## highlight CRISPR-Cas9 region
-
-```{r SLC22A5 high, warning=FALSE, cache=TRUE, fig.width=12, fig.height=5}
-
-ht <- HighlightTrack(trackList = list(axTrack, ncbi_ref),
-                     start = c(132384160, 132378383), width = 10,
-                     chromosome = 5)
-
-lim <- c(fromA5, toA5)
-
-plotTracks(list(idxTrack, ht), from = lim[1], to = lim[2])
-
-
-```
 
 ## luciferase regions
 
