@@ -23,6 +23,8 @@ library(biomaRt)
 
 ```{r tracknames, warning=FALSE}
 
+dir.create("./images_visualisation")
+save_dir <- "./images_visualisation/"
 session <- browserSession()
 genome(session) <- "hg38"
 trackNames(session)
@@ -57,20 +59,18 @@ ncbi_ref <- UcscTrack(genome="hg38", chromosome="chr6", track="NCBI RefSeq",
                     rstarts="exonStarts", rends="exonEnds", gene="name", 
                     symbol="name", transcript="name", strand="strand", 
                     fill="#767676",stacking="squish", name="NCBI RefSeq", 
-                    showId=TRUE, geneSymbol=TRUE)
+                    showId=TRUE, geneSymbol=TRUE, fontsize.group=12)
 
 
 biomTrack <- BiomartGeneRegionTrack(genome="hg38", chromosome="chr6",
                                     start=fromA1, end=toA1, name="Ensembl")
 
 
-###Data tracks
-
 
 
 ###Other tracks and plotting: 
 
-axTrack <- GenomeAxisTrack(labelPos="below", height=6)
+axTrack <- GenomeAxisTrack(labelPos="below", height=6, cex=0.8)
 idxTrack <- IdeogramTrack(genome="hg38", chromosome="chr6")
 
 ##PLOTTING
@@ -83,14 +83,13 @@ plotTracks(list(idxTrack, axTrack, ncbi_ref), from=fromA1, toA1, showTitle=TRUE,
 ## highlight CRISPR-Cas9 region
 
 ```{r SLC22A1 high, warning=FALSE, cache=TRUE, fig.width=8, fig.height=5}
+png(paste0(save_dir, "SLC22A1_crispr.png"), width=800, height=400)
 ht <- HighlightTrack(trackList = list(axTrack, ncbi_ref),
                      start = c(160136234, 160133991), width = 10,
                      chromosome = 6)
-
 lim <- c(fromA1, toA1)
-
 plotTracks(list(idxTrack, ht), from = lim[1], to = lim[2])
-
+dev.off() # a function call to save the file
 ```
 
 ## luciferase regions
@@ -113,12 +112,13 @@ head(luciferase_plasmids)
 ```
 
 ```{r SLC22A1 LUCIFERASE, warning=FALSE, cache=TRUE, fig.width=12, fig.height=4}
+png(paste0(save_dir, "SLC22A1_luciferase_plasmids.png"),  width=800, height=400)
 grtrack <- GeneRegionTrack(luciferase_plasmids, genome = "hg38",
                            chromosome = "chr6",
                            name = "Luciferase regions")
 
-plotTracks(list(idxTrack,axTrack, ncbi_ref, grtrack), from = 160118000, to = 160126000, transcriptAnnotation="gene")
-
+plotTracks(list(idxTrack,axTrack, ncbi_ref, grtrack), from = 160118700, to = 160125500, transcriptAnnotation="gene")
+dev.off()
 ```
 
 # SLC22A5
@@ -162,7 +162,7 @@ plotTracks(list(idxTrack, axTrack, ncbi_ref), from=fromA5, to=toA5, showTitle=TR
 ## highlight CRISPR-Cas9 region
 
 ```{r SLC22A5 high, warning=FALSE, cache=TRUE, fig.width=12, fig.height=5}
-
+png(paste0(save_dir, "SLC22A5_crispr.png"),  width=800, height=400)
 ht <- HighlightTrack(trackList = list(axTrack, ncbi_ref),
                      start = c(132384160, 132378383), width = 10,
                      chromosome = 5)
@@ -170,20 +170,21 @@ ht <- HighlightTrack(trackList = list(axTrack, ncbi_ref),
 lim <- c(fromA5, toA5)
 
 plotTracks(list(idxTrack, ht), from = lim[1], to = lim[2])
-
+dev.off()
 
 ```
 
 ## luciferase regions
 
 
-```{r SLC22A5 LUCIFERASE, warning=FALSE, cache=TRUE, fig.width=12, fig.height=6}
+```{r SLC22A5 LUCIFERASE, warning=FALSE, cache=TRUE, fig.width=10, fig.height=4}
+png(paste0(save_dir, "SLC22A5_luciferase.png"), width=800, height=400)
 grtrack <- GeneRegionTrack(luciferase_plasmids, genome = "hg38",
                            chromosome = "chr5",
                            name = "Luciferase regions")
 
-plotTracks(list(idxTrack,axTrack, ncbi_ref, grtrack), from = fromA5, to = 132389321, transcriptAnnotation="gene")
-
+plotTracks(list(idxTrack,axTrack, ncbi_ref, grtrack), from = 132368100, to = 132380000, transcriptAnnotation="gene")
+dev.off()
 ```
 
 
@@ -192,8 +193,8 @@ plotTracks(list(idxTrack,axTrack, ncbi_ref, grtrack), from = fromA5, to = 132389
 ```{r SLC22A4, warning=FALSE, cache=TRUE, fig.width=14, fig.height=4}
 
 ###Simple annotation tracks:
-fromA4 <- 132290928
-toA4 <- 132345343
+fromA4 <- 132290028
+toA4 <- 132345043
 
 
 ##Gene model type tracks:
@@ -228,7 +229,7 @@ plotTracks(list(idxTrack, axTrack, ncbi_ref), from=fromA4, to=toA4, showTitle=TR
 ## highlight CRISPR-Cas9 region
 
 ```{r SLC22A4 high, warning=FALSE, cache=TRUE, fig.width=16, fig.height=6}
-
+png(paste0(save_dir, "SLC22A4_crispr.png"),  width=850, height=400)
 ht <- HighlightTrack(trackList = list(axTrack, ncbi_ref),
                      start = c(132313626, 132312204), width = 7,
                      chromosome = 5)
@@ -236,20 +237,20 @@ ht <- HighlightTrack(trackList = list(axTrack, ncbi_ref),
 lim <- c(fromA4, toA4)
 
 plotTracks(list(idxTrack, ht), from = lim[1], to = lim[2])
-
-
+dev.off()
 ```
 
 ## luciferase regions
 
 
 ```{r SLC22A4 LUCIFERASE, warning=FALSE, cache=TRUE, fig.width=12, fig.height=4}
+png(paste0(save_dir, "SLC22A4_luciferase.png"), width=800, height=400)
 grtrack <- GeneRegionTrack(luciferase_plasmids, genome = "hg38",
                            chromosome = "chr5",
                            name = "Luciferase regions")
 
-plotTracks(list(idxTrack,axTrack, ncbi_ref, grtrack), from = 132293519, to = 132295119, transcriptAnnotation="gene")
-
+plotTracks(list(idxTrack,axTrack, ncbi_ref, grtrack), from = 132293659, to = 132295050, transcriptAnnotation="gene")
+dev.off()
 ```
 
 
